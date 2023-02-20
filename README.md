@@ -1,4 +1,4 @@
-To clone and use this repo effectively to interact with the database, you set the envronment variables.
+To clone and use this repo effectively to interact with the databases, you must set the envronment variables.
 
 To do this:
 
