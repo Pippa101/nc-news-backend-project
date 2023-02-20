@@ -6,8 +6,6 @@ const {
   errorHandler400,
 } = require("./error-handling-controllers");
 
-app.use(express.json());
-
 app.get("/api", getApiMsg);
 
 app.get("/api/topics", getTopics);
