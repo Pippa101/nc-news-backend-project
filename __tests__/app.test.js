@@ -44,4 +44,29 @@ describe("app", () => {
       return request(app).get("/api/banana").expect(404);
     });
   });
+  describe("/api/articles", () => {
+    it("returns a 200 status : GET responds with an array of article objects with the relevant keys", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          for (let article of body) {
+            console.log(article);
+            expect(article).toHaveProperty("author", expect.any(String));
+            expect(article).toHaveProperty("title", expect.any(String));
+            expect(article).toHaveProperty("article_id", expect.any(Number));
+            expect(article).toHaveProperty("topic", expect.any(String));
+            expect(article).toHaveProperty("created_at", expect.any(String));
+            expect(article).toHaveProperty(
+              "article_img_url",
+              expect.any(String)
+            );
+            expect(article).toHaveProperty("comment_count", expect.any(Number));
+          }
+        });
+    });
+    it("should return 404 status : GET responds with error msg when end point does not exist yet", () => {
+      return request(app).get("/api/articlez").expect(404);
+    });
+  });
 });
