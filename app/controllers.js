@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticles } = require("./models");
+const { fetchTopics, fetchArticles, fetchArticleById } = require("./models");
 function getApiMsg(req, res, next) {
   return res.status(200).send({ msg: "server working" }).catch(next);
 }
@@ -19,4 +19,14 @@ function getArticles(req, res, next) {
     .catch(next);
 }
 
-module.exports = { getApiMsg, getTopics, getArticles };
+function getArticleById(req, res, next) {
+  const { article_id } = req.params;
+
+  return fetchArticleById(article_id)
+    .then((article) => {
+      res.status(200).send(article);
+    })
+    .catch(next);
+}
+
+module.exports = { getApiMsg, getTopics, getArticles, getArticleById };

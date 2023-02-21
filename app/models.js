@@ -1,15 +1,12 @@
 const { query } = require("../db/connection");
 const db = require("../db/connection");
 const comments = require("../db/data/test-data/comments");
-
+const format = require("pg-format");
 function fetchTopics() {
   return db.query(`SELECT * FROM topics;`).then((result) => {
     return result.rows;
   });
 }
-// -Select everything from the articles table -tick
-//-order the data by year (newest first) -tick
-//- create a comment count - refers to comment objects with relevant article id.
 
 function fetchArticles() {
   return db
@@ -27,4 +24,16 @@ function fetchArticles() {
     });
 }
 
-module.exports = { fetchTopics, fetchArticles };
+function fetchArticleById(article_id) {
+  return db
+    .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+    .then((article) => {
+      if (article.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "couldn't find article" });
+      } else {
+        return article.rows[0];
+      }
+    });
+}
+
+module.exports = { fetchTopics, fetchArticles, fetchArticleById };
