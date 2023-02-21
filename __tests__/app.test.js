@@ -3,6 +3,7 @@ const app = require("../app/app");
 const testData = require("../db/data/test-data/index");
 const seed = require("../db/seeds/seed");
 const connection = require("../db/connection.js");
+const sort = require("jest-sorted");
 
 afterAll(() => connection.end());
 beforeEach(() => seed(testData));
@@ -45,13 +46,15 @@ describe("app", () => {
     });
   });
   describe("/api/articles", () => {
-    it("returns a 200 status : GET responds with an array of article objects with the relevant keys", () => {
+    it("returns a 200 status : GET responds with an array of all the article objects with the relevant keys", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
-        .then(({ body }) => {
-          for (let article of body) {
-            console.log(article);
+        .then((articlesResponse) => {
+          const articles = articlesResponse.body;
+          expect(articles.length).toBe(12);
+
+          for (let article of articles) {
             expect(article).toHaveProperty("author", expect.any(String));
             expect(article).toHaveProperty("title", expect.any(String));
             expect(article).toHaveProperty("article_id", expect.any(Number));
@@ -63,6 +66,17 @@ describe("app", () => {
             );
             expect(article).toHaveProperty("comment_count", expect.any(Number));
           }
+        });
+    });
+    it("should return 200 : GET responds with the articles in the correct order, sorted by most recent date", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((articlesResponse) => {
+          const articles = articlesResponse.body;
+          expect(articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
         });
     });
     it("should return 404 status : GET responds with error msg when end point does not exist yet", () => {

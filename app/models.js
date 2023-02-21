@@ -16,7 +16,7 @@ function fetchArticles() {
     .query(
       `SELECT COUNT(comments.article_id) :: INT AS comment_count,
       articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url 
-      FROM comments JOIN articles
+      FROM comments RIGHT OUTER JOIN articles
       ON comments.article_id = articles.article_id
       GROUP BY articles.article_id
       ORDER BY created_at DESC;
