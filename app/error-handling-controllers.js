@@ -1,5 +1,5 @@
 function errorHandler400s(error, req, res, next) {
-  if (error.msg === "couldn't find article") {
+  if (error.msg && error.status) {
     res.status(404).send({ msg: "Article not found" });
   } else {
     next(error);

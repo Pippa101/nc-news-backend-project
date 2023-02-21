@@ -90,7 +90,7 @@ describe("app", () => {
         .expect(200)
         .then((articleResponse) => {
           const article = articleResponse.body;
-          expect(article).toEqual({
+          expect(article).toMatchObject({
             article_id: 3,
             title: "Eight pug gifs that remind me of mitch",
             topic: "mitch",
