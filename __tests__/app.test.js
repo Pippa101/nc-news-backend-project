@@ -161,6 +161,7 @@ describe("app", () => {
     it("should return 400 : GET responds with error msg: invalid ID when an invalid article id (invalid datatype) is used", () => {
       return request(app)
         .get("/api/articles/LOL/comments")
+        .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("Invalid ID");
         });
@@ -168,6 +169,7 @@ describe("app", () => {
     it("should return a 404 status : GET repsonds with an error msg when nonExistant id is used (buu still a valid datatype) is used", () => {
       return request(app)
         .get("/api/articles/50/comments")
+        .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("Not Found");
         });
