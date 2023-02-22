@@ -166,12 +166,100 @@ describe("app", () => {
           expect(body.msg).toBe("Invalid ID");
         });
     });
-    it("should return a 404 status : GET repsonds with an error msg when nonExistant id is used (buu still a valid datatype) is used", () => {
+    it("should return a 404 status : GET repsonds with an error msg when nonExistant id is used (but still a valid datatype) is used", () => {
       return request(app)
         .get("/api/articles/50/comments")
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("Not Found");
+        });
+    });
+  });
+  describe("POST /api/articles/:article_id/comments", () => {
+    it("should return 200 status : POST returns a comment object with the correct properties including the correct article_id", () => {
+      const newComment = {
+        username: "lurker",
+        body: "omg can you believe it!?",
+      };
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send(newComment)
+        .expect(201)
+        .then((comments) => {
+          expect(comments.body).toMatchObject({
+            comment_id: 19,
+            body: "omg can you believe it!?",
+            votes: 0,
+            author: "lurker",
+            article_id: 3,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    it("should return a 404 status : POST repsonds with an error msg when an unknown id is used (but still a valid datatype) is used", () => {
+      const newComment = {
+        username: "lurker",
+        body: "omg can you believe it!?",
+      };
+      return request(app)
+        .post("/api/articles/50/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not Found");
+        });
+    });
+    it("should return a 400 status : POST repsonds with an error msg when an invalid id is used", () => {
+      const newComment = {
+        username: "lurker",
+        body: "omg can you believe it!?",
+      };
+      return request(app)
+        .post("/api/articles/LOL/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid ID");
+        });
+    });
+    it("should return a 400 status : POST repsonds with an error msg when the comment body does not include username or body properties", () => {
+      const newComment = {
+        OMG: "",
+        thumbs: "",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid comment");
+        });
+    });
+    it("should return a 400 status : POST repsonds with an error msg when the comment object properties contain the wrong datatypes", () => {
+      const newComment = {
+        username: 5,
+        body: [],
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid comment");
+        });
+    });
+    it("should return a 400 status : POST repsonds with an error msg when the comment object contains more than 2 properties", () => {
+      const newComment = {
+        username: "lurken",
+        body: "unpopular opinion but, I'm not a dog OR a cat person ... I like frogs",
+        img: "frog.jpeg",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid comment");
         });
     });
   });

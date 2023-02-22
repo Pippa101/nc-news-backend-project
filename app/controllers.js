@@ -3,6 +3,7 @@ const {
   fetchArticles,
   fetchArticleById,
   fetchCommentsByArticleId,
+  insertComment,
 } = require("./models");
 function getApiMsg(req, res, next) {
   return res.status(200).send({ msg: "server working" }).catch(next);
@@ -45,10 +46,21 @@ function getArticleComments(req, res, next) {
     .catch(next);
 }
 
+function postComment(req, res, next) {
+  const { article_id } = req.params;
+  const newComment = req.body;
+  return insertComment(newComment, article_id)
+    .then((comment) => {
+      res.status(201).send(comment);
+    })
+    .catch(next);
+}
+
 module.exports = {
   getApiMsg,
   getTopics,
   getArticles,
   getArticleById,
   getArticleComments,
+  postComment,
 };

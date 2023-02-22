@@ -47,9 +47,32 @@ function fetchCommentsByArticleId(article_id) {
     });
 }
 
+function insertComment(newComment, article_id) {
+  const { username: author, body } = newComment;
+
+  if (
+    (!author || !body || typeof author !== "string",
+    typeof body !== "string" || Object.keys(newComment).length > 2)
+  ) {
+    return Promise.reject({ status: 400, msg: "Invalid comment" });
+  }
+  return db
+    .query(
+      `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *`,
+      [author, body, article_id]
+    )
+    .then((comment) => {
+      if (!comment) {
+        return Promise.reject({ status: 404, msg: "Not Found" });
+      } else {
+        return comment.rows[0];
+      }
+    });
+}
 module.exports = {
   fetchTopics,
   fetchArticles,
   fetchArticleById,
   fetchCommentsByArticleId,
+  insertComment,
 };
