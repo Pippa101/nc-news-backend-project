@@ -1,6 +1,6 @@
-function errorHandler400s(error, req, res, next) {
+function customErrorHandler(error, req, res, next) {
   if (error.msg && error.status) {
-    res.status(404).send({ msg: "Article not found" });
+    res.status(error.status).send({ msg: error.msg });
   } else {
     next(error);
   }
@@ -14,7 +14,11 @@ function psqlErrorHandler(error, req, res, next) {
   }
 }
 
-function errorHandler500(error, req, res, next) {
-  return res.status(500).send({ msg: "500 error server issue" });
+function catch500(error, req, res, next) {
+  return res.status(500).send({ msg: "Server error" });
 }
-module.exports = { errorHandler400s, errorHandler500, psqlErrorHandler };
+module.exports = {
+  customErrorHandler,
+  psqlErrorHandler,
+  catch500,
+};

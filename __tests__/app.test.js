@@ -108,7 +108,7 @@ describe("app", () => {
         .get("/api/articles/50")
         .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe("Article not found");
+          expect(body.msg).toBe("Not Found");
         });
     });
     it("should return a 400 status : GET responds with an error msg when an invalid id is used (invalid datatype)", () => {
@@ -117,6 +117,61 @@ describe("app", () => {
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("Invalid ID");
+        });
+    });
+  });
+  describe("GET /api/articles/:articles_id/comments", () => {
+    it("should return 200: GET responds with an array of all the comment objects with the correct properties belonging to the correct article", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then((articleComments) => {
+          const comments = articleComments.body;
+          expect(comments.length).toBe(11);
+          for (let comment of comments) {
+            expect(comment).toHaveProperty("comment_id", expect.any(Number));
+            expect(comment).toHaveProperty("votes", expect.any(Number));
+            expect(comment).toHaveProperty("created_at", expect.any(String));
+            expect(comment).toHaveProperty("author", expect.any(String));
+            expect(comment).toHaveProperty("body", expect.any(String));
+            expect(comment).toHaveProperty("article_id", 1);
+          }
+        });
+    });
+    it("should return 200: GET responds with the comments array ordered by the most recent comment first", () => {
+      return request(app)
+        .get("/api/articles/3/comments")
+        .expect(200)
+        .then((articleComments) => {
+          const comments = articleComments.body;
+          expect(comments).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    it("should return 200 : GET responds with an empty array when article_id is valid and exists, but there are no comments associated with it", () => {
+      return request(app)
+        .get("/api/articles/7/comments")
+        .expect(200)
+        .then((articleComments) => {
+          const comments = articleComments.body;
+          expect(comments).toMatchObject([]);
+        });
+    });
+    it("should return 400 : GET responds with error msg: invalid ID when an invalid article id (invalid datatype) is used", () => {
+      return request(app)
+        .get("/api/articles/LOL/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid ID");
+        });
+    });
+    it("should return a 404 status : GET repsonds with an error msg when nonExistant id is used (buu still a valid datatype) is used", () => {
+      return request(app)
+        .get("/api/articles/50/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not Found");
         });
     });
   });
