@@ -176,7 +176,7 @@ describe("app", () => {
     });
   });
   describe("PATCH api/articles/:article_id", () => {
-    it("should return 200 : PATCH updates the votes key on the correct article object by the number indicated in the request body object", () => {
+    it("should return 202 : PATCH updates the votes key on the correct article object by the number indicated in the request body object - checking positive", () => {
       const newVote = { inc_votes: 5 };
       return request(app)
         .patch("/api/articles/3")
@@ -196,6 +196,26 @@ describe("app", () => {
           });
         });
     });
+    it("should return 202 : PATCH updates the votes key on the correct article object by the number indicated in the request body object -checking negative numbers", () => {
+      const newVote = { inc_votes: -20 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(newVote)
+        .expect(202)
+        .then((article) => {
+          expect(article.body).toMatchObject({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 80,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
     it("should return 404 status : PATCH responds with an error msg when the article id does not exist (but is the correct datatype)", () => {
       const newVote = { inc_votes: 3 };
       return request(app)
@@ -206,5 +226,45 @@ describe("app", () => {
           expect(body.msg).toBe("Not Found");
         });
     });
+    it("should return 400: PATCH responds with an error msg when an invalid article id is used (invalid datatype)", () => {
+      const newVote = { inc_votes: 3 };
+      return request(app)
+        .patch("/api/articles/LOL")
+        .send(newVote)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid ID");
+        });
+    });
+  });
+  it("should return 400: PATCH responds with an error msg when the req body inc_votes does not have a number value", () => {
+    const newVote = { inc_votes: "rebel" };
+    return request(app)
+      .patch("/api/articles/3")
+      .send(newVote)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  it("should return 202 : PATCH updates the votes key on the correct article object and ignores any extra properties", () => {
+    const newVote = { inc_votes: -20, somethingExtra: "ohlala" };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newVote)
+      .expect(202)
+      .then((article) => {
+        expect(article.body).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 80,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
   });
 });

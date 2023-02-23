@@ -48,13 +48,16 @@ function fetchCommentsByArticleId(article_id) {
 }
 
 function updateVotes(article_id, inc_votes) {
+  console.log(typeof inc_votes);
+  if (typeof inc_votes !== "number") {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
   return db
     .query(
-      `UPDATE articles SET votes = $1 WHERE article_id = $2 RETURNING *;`,
+      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,
       [inc_votes, article_id]
     )
     .then((updatedArticle) => {
-      console.log(updatedArticle.rows);
       return updatedArticle.rows[0];
     });
 }
