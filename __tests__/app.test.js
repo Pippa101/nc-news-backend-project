@@ -176,7 +176,7 @@ describe("app", () => {
     });
   });
   describe("PATCH api/articles/:article_id", () => {
-    it("should return 202 : PATCH updates the votes key on the correct article object by the number indicated in the request body object - checking positive", () => {
+    it("should return 200 : PATCH updates the votes key on the correct article object by the number indicated in the request body object - checking positive", () => {
       const newVote = { inc_votes: 5 };
       return request(app)
         .patch("/api/articles/3")
@@ -196,7 +196,7 @@ describe("app", () => {
           });
         });
     });
-    it("should return 202 : PATCH updates the votes key on the correct article object by the number indicated in the request body object -checking negative numbers", () => {
+    it("should return 200 : PATCH updates the votes key on the correct article object by the number indicated in the request body object -checking negative numbers", () => {
       const newVote = { inc_votes: -20 };
       return request(app)
         .patch("/api/articles/1")
@@ -247,7 +247,7 @@ describe("app", () => {
         expect(body.msg).toBe("Bad Request");
       });
   });
-  it("should return 202 : PATCH updates the votes key on the correct article object and ignores any extra properties", () => {
+  it("should return 200 : PATCH updates the votes key on the correct article object and ignores any extra properties", () => {
     const newVote = { inc_votes: -20, somethingExtra: "ohlala" };
     return request(app)
       .patch("/api/articles/1")
