@@ -82,6 +82,12 @@ function updateVotes(article_id, inc_votes) {
       return updatedArticle.rows[0];
     });
 }
+
+function fetchUsers() {
+  return db.query(`SELECT * FROM users;`).then((users) => {
+    return users.rows;
+  });
+}
 module.exports = {
   fetchTopics,
   fetchArticles,
@@ -89,4 +95,5 @@ module.exports = {
   fetchCommentsByArticleId,
   updateVotes,
   insertComment,
+  fetchUsers,
 };

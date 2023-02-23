@@ -5,6 +5,7 @@ const {
   fetchCommentsByArticleId,
   updateVotes,
   insertComment,
+  fetchUsers,
 } = require("./models");
 function getApiMsg(req, res, next) {
   return res.status(200).send({ msg: "server working" }).catch(next);
@@ -69,6 +70,14 @@ function updateArticleVotes(req, res, next) {
     .catch(next);
 }
 
+function getUsers(req, res, next) {
+  return fetchUsers()
+    .then((users) => {
+      res.status(200).send(users);
+    })
+    .catch(next);
+}
+
 module.exports = {
   getApiMsg,
   getTopics,
@@ -77,4 +86,5 @@ module.exports = {
   getArticleComments,
   updateArticleVotes,
   postComment,
+  getUsers,
 };

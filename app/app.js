@@ -8,6 +8,7 @@ const {
   getArticleComments,
   updateArticleVotes,
   postComment,
+  getUsers,
 } = require("./controllers");
 const {
   customErrorHandler,
@@ -24,8 +25,9 @@ app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getArticleComments);
 
 app.patch("/api/articles/:article_id", updateArticleVotes);
-
 app.post("/api/articles/:article_id/comments", postComment);
+app.get("/api/users", getUsers);
+
 app.use(customErrorHandler);
 app.use(psqlErrorHandler);
 
