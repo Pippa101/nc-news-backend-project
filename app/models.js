@@ -70,7 +70,6 @@ function insertComment(newComment, article_id) {
 }
 
 function updateVotes(article_id, inc_votes) {
-  console.log(typeof inc_votes);
   if (typeof inc_votes !== "number") {
     return Promise.reject({ status: 400, msg: "Bad Request" });
   }
@@ -83,6 +82,12 @@ function updateVotes(article_id, inc_votes) {
       return updatedArticle.rows[0];
     });
 }
+
+function fetchUsers() {
+  return db.query(`SELECT * FROM users;`).then((users) => {
+    return users.rows;
+  });
+}
 module.exports = {
   fetchTopics,
   fetchArticles,
@@ -90,4 +95,5 @@ module.exports = {
   fetchCommentsByArticleId,
   updateVotes,
   insertComment,
+  fetchUsers,
 };
