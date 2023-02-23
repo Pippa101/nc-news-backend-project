@@ -3,6 +3,7 @@ const {
   fetchArticles,
   fetchArticleById,
   fetchCommentsByArticleId,
+  updateVotes,
   insertComment,
 } = require("./models");
 function getApiMsg(req, res, next) {
@@ -56,11 +57,24 @@ function postComment(req, res, next) {
     .catch(next);
 }
 
+function updateArticleVotes(req, res, next) {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+  const insert = updateVotes(article_id, inc_votes);
+  const checkId = fetchArticleById(article_id);
+  return Promise.all([insert, checkId])
+    .then((updatedArticle) => {
+      res.status(202).send(updatedArticle[0]);
+    })
+    .catch(next);
+}
+
 module.exports = {
   getApiMsg,
   getTopics,
   getArticles,
   getArticleById,
   getArticleComments,
+  updateArticleVotes,
   postComment,
 };

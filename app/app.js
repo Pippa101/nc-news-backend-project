@@ -6,6 +6,7 @@ const {
   getArticles,
   getArticleById,
   getArticleComments,
+  updateArticleVotes,
   postComment,
 } = require("./controllers");
 const {
@@ -13,7 +14,6 @@ const {
   psqlErrorHandler,
   catch500,
 } = require("./error-handling-controllers");
-
 app.use(express.json());
 app.get("/api", getApiMsg);
 
@@ -22,6 +22,9 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getArticleComments);
+
+app.patch("/api/articles/:article_id", updateArticleVotes);
+
 app.post("/api/articles/:article_id/comments", postComment);
 app.use(customErrorHandler);
 app.use(psqlErrorHandler);
