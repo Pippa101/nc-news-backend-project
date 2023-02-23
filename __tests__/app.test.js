@@ -248,18 +248,38 @@ describe("app", () => {
           expect(body.msg).toBe("Invalid comment");
         });
     });
-    it("should return a 400 status : POST repsonds with an error msg when the comment object contains more than 2 properties", () => {
+    it("should return a 201 status : POST repsonds with a comment object which ignores extra properties that are not username or body", () => {
       const newComment = {
-        username: "lurken",
+        username: "butter_bridge",
         body: "unpopular opinion but, I'm not a dog OR a cat person ... I like frogs",
         img: "frog.jpeg",
       };
       return request(app)
         .post("/api/articles/1/comments")
         .send(newComment)
-        .expect(400)
+        .expect(201)
+        .then((comments) => {
+          expect(comments.body).toMatchObject({
+            comment_id: 19,
+            body: "unpopular opinion but, I'm not a dog OR a cat person ... I like frogs",
+            votes: 0,
+            author: "butter_bridge",
+            article_id: 1,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    it("shoudl return 404 status : POST responds with an error msg when the username does not exist in the database", () => {
+      const newComment = {
+        username: "bob",
+        body: "hi I'm bob I don't have an account",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe("Invalid comment");
+          expect(body.msg).toBe("Not Found");
         });
     });
   });

@@ -51,8 +51,7 @@ function insertComment(newComment, article_id) {
   const { username: author, body } = newComment;
 
   if (
-    (!author || !body || typeof author !== "string",
-    typeof body !== "string" || Object.keys(newComment).length > 2)
+    (!author || !body || typeof author !== "string", typeof body !== "string")
   ) {
     return Promise.reject({ status: 400, msg: "Invalid comment" });
   }
