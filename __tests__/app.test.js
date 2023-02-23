@@ -402,4 +402,30 @@ describe("app", () => {
       return request(app).get("/api/userz").expect(404);
     });
   });
+
+  describe("GET api/articles (queries)", () => {
+    it("should return a 200 status: GET responds with an array of articles corresponding to the topic passed in the query", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then((articles) => {
+          const topicArticles = articles.body;
+          for (article of topicArticles) {
+            expect(article).toHaveProperty("topic", "mitch");
+          }
+        });
+    });
+    //   it("should return a 200 status: GET responds with an array of articles sorted by the column name queried", () => {
+    //     return request(app)
+    //       .get("/api/articles?sort_by=votes")
+    //       .expect(200)
+    //       .then((articles) => {
+    //         const sortedArticles = articles.body;
+    //         console.log(sortedArticles);
+    //         expect(sortedArticles).toBeSortedBy("votes", {
+    //           descending: true,
+    //         });
+    //       });
+    //   });
+  });
 });

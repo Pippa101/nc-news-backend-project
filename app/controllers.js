@@ -20,7 +20,8 @@ function getTopics(req, res, next) {
 }
 
 function getArticles(req, res, next) {
-  return fetchArticles()
+  const query = req.query;
+  return fetchArticles(query)
     .then((articles) => {
       res.status(200).send(articles);
     })
