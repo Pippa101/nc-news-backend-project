@@ -9,6 +9,8 @@ function customErrorHandler(error, req, res, next) {
 function psqlErrorHandler(error, req, res, next) {
   if (error.code === "22P02") {
     res.status(400).send({ msg: "Invalid ID" });
+  } else if (error.code === "23503") {
+    res.status(404).send({ msg: "Not Found" });
   } else {
     next(error);
   }

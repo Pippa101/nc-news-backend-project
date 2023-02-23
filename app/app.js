@@ -6,6 +6,7 @@ const {
   getArticles,
   getArticleById,
   getArticleComments,
+  postComment,
 } = require("./controllers");
 const {
   customErrorHandler,
@@ -13,6 +14,7 @@ const {
   catch500,
 } = require("./error-handling-controllers");
 
+app.use(express.json());
 app.get("/api", getApiMsg);
 
 app.get("/api/topics", getTopics);
@@ -20,7 +22,7 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getArticleComments);
-
+app.post("/api/articles/:article_id/comments", postComment);
 app.use(customErrorHandler);
 app.use(psqlErrorHandler);
 
