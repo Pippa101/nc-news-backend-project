@@ -70,7 +70,6 @@ function insertComment(newComment, article_id) {
 }
 
 function updateVotes(article_id, inc_votes) {
-  console.log(typeof inc_votes);
   if (typeof inc_votes !== "number") {
     return Promise.reject({ status: 400, msg: "Bad Request" });
   }
