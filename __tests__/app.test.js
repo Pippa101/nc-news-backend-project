@@ -403,13 +403,14 @@ describe("app", () => {
     });
   });
 
-  describe.only("GET api/articles (queries)", () => {
+  describe("GET api/articles (queries)", () => {
     it("should return a 200 status: GET responds with an array of articles corresponding to the topic passed in the query", () => {
       return request(app)
         .get("/api/articles?topic=mitch")
         .expect(200)
         .then((articles) => {
           const topicArticles = articles.body;
+          expect(topicArticles.length).toBe(11);
           for (article of topicArticles) {
             expect(article.topic).toStrictEqual("mitch");
             expect(article.topic).not.toStrictEqual("cats");
@@ -456,6 +457,28 @@ describe("app", () => {
       return request(app)
         .get("/api/articles?topic=darkness&sort_by=lol&order_by=asp")
         .expect(400);
+    });
+    it("should return a 200 status: GET responds with an array of articles ordered by comment_count (descending by default)", () => {
+      return request(app)
+        .get("/api/articles?sort_by=comment_count")
+        .expect(200)
+        .then((articles) => {
+          const sortedArticles = articles.body;
+          expect(sortedArticles).toBeSortedBy("comment_count", {
+            descending: true,
+          });
+        });
+    });
+  });
+  describe.only("DELETE /api/comments/:comment_id", () => {
+    it("should return a 204 status : DELETE returns nothing", () => {
+      return request(app).delete("/api/comments/1").expect(204);
+    });
+    it("DELETE : returns 404 when the comment_id is not found", () => {
+      return request(app).delete("/api/comments/50").expect(404);
+    });
+    it("DELETE : returns 400 when the comment_id is invalid", () => {
+      return request(app).delete("/api/comments/ahhhh").expect(400);
     });
   });
 });

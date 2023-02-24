@@ -19,7 +19,6 @@ function fetchArticles(query) {
 
   // if a query has been used in the URL
   if (Object.keys(query).length > 0) {
-    console.log("im here");
     const queryParams = [];
 
     let updatedQuery = `SELECT COUNT(comments.article_id) :: INT AS comment_count,
@@ -37,7 +36,9 @@ function fetchArticles(query) {
 
     if (
       query.sort_by !== undefined &&
-      !["votes", "created_at", "author", "title"].includes(query.sort_by)
+      !["votes", "created_at", "author", "title", "comment_count"].includes(
+        query.sort_by
+      )
     ) {
       return Promise.reject({ status: 400, msg: "Bad Request" });
     } else if (query.sort_by !== undefined) {
@@ -58,7 +59,6 @@ function fetchArticles(query) {
     }
 
     return db.query(updatedQuery, queryParams).then((articles) => {
-      console.log(updatedQuery);
       return articles.rows;
     });
 
@@ -134,6 +134,27 @@ function fetchUsers() {
     return users.rows;
   });
 }
+function fetchCommentsById(comment_id) {
+  return db
+    .query(`SELECT * FROM comments WHERE comment_id = $1;`, [comment_id])
+    .then((comment) => {
+      if (comment.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Not Found" });
+      } else {
+        return comment.rows;
+      }
+    });
+}
+
+function removeCommentById(comment_id) {
+  return db
+    .query(`DELETE FROM comments WHERE comment_id=$1 RETURNING *;`, [
+      comment_id,
+    ])
+    .then((deletedComment) => {
+      return deletedComment.rows;
+    });
+}
 module.exports = {
   fetchTopics,
   fetchArticles,
@@ -142,4 +163,6 @@ module.exports = {
   updateVotes,
   insertComment,
   fetchUsers,
+  removeCommentById,
+  fetchCommentsById,
 };
