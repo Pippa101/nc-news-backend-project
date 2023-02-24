@@ -17,7 +17,7 @@ function psqlErrorHandler(error, req, res, next) {
 }
 
 function catch500(error, req, res, next) {
-  return res.status(500).send({ msg: "Server error" });
+  res.status(500).send({ msg: "Server error" });
 }
 module.exports = {
   customErrorHandler,

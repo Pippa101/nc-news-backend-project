@@ -402,4 +402,60 @@ describe("app", () => {
       return request(app).get("/api/userz").expect(404);
     });
   });
+
+  describe.only("GET api/articles (queries)", () => {
+    it("should return a 200 status: GET responds with an array of articles corresponding to the topic passed in the query", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then((articles) => {
+          const topicArticles = articles.body;
+          for (article of topicArticles) {
+            expect(article.topic).toStrictEqual("mitch");
+            expect(article.topic).not.toStrictEqual("cats");
+          }
+        });
+    });
+    it("should return a 200 status: GET responds with an array of articles sorted by the column name queried in descending order (default)", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes")
+        .expect(200)
+        .then((articles) => {
+          const sortedArticles = articles.body;
+          expect(sortedArticles).toBeSortedBy("votes", {
+            descending: true,
+          });
+        });
+    });
+    it("should return a 400 status: GET responds with an err msg when a user tries to sort_by an invalid query", () => {
+      return request(app).get("/api/articles?sort_by=pics").expect(400);
+    });
+    it("should return a 200 status: GET responds with an array of articles sorted by the date DESC if no sort parameters are specified", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((articles) => {
+          const sortedArticles = articles.body;
+          expect(sortedArticles).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    it("should return a 200 status: GET responds with an array of articles ordered in ascending order when specified", () => {
+      return request(app)
+        .get("/api/articles?order_by=ASC")
+        .expect(200)
+        .then((articles) => {
+          const sortedArticles = articles.body;
+          expect(sortedArticles).toBeSortedBy("created_at", {
+            ascending: true,
+          });
+        });
+    });
+    it("should return 400 status : GET responds with error msg if the query parameters do not exist", () => {
+      return request(app)
+        .get("/api/articles?topic=darkness&sort_by=lol&order_by=asp")
+        .expect(400);
+    });
+  });
 });
