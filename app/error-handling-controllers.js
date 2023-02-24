@@ -1,6 +1,5 @@
 function customErrorHandler(error, req, res, next) {
   if (error.msg && error.status) {
-    console.log(error);
     res.status(error.status).send({ msg: error.msg });
   } else {
     next(error);
