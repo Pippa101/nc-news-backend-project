@@ -6,6 +6,8 @@ const {
   updateVotes,
   insertComment,
   fetchUsers,
+  removeCommentById,
+  fetchCommentsById,
 } = require("./models");
 function getApiMsg(req, res, next) {
   return res.status(200).send({ msg: "server working" }).catch(next);
@@ -21,7 +23,6 @@ function getTopics(req, res, next) {
 
 function getArticles(req, res, next) {
   const query = req.query;
-  console.log(query);
   return fetchArticles(query)
     .then((articles) => {
       res.status(200).send(articles);
@@ -80,6 +81,17 @@ function getUsers(req, res, next) {
     .catch(next);
 }
 
+function deleteComment(req, res, next) {
+  const { comment_id } = req.params;
+  const commentIdCheck = fetchCommentsById(comment_id);
+  const deleting = removeCommentById(comment_id);
+  Promise.all([deleting, commentIdCheck])
+    .then((deletedComment) => {
+      res.status(204).send(deletedComment);
+    })
+    .catch(next);
+}
+
 module.exports = {
   getApiMsg,
   getTopics,
@@ -89,4 +101,5 @@ module.exports = {
   updateArticleVotes,
   postComment,
   getUsers,
+  deleteComment,
 };
