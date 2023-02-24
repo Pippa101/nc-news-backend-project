@@ -9,39 +9,65 @@ function fetchTopics() {
 }
 
 function fetchArticles(query) {
-  const queryParams = [];
   let queryStr = `SELECT COUNT(comments.article_id) :: INT AS comment_count,
-      articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url 
-      FROM comments RIGHT OUTER JOIN articles
-      ON comments.article_id = articles.article_id
-      GROUP BY articles.article_id
-      ORDER BY created_at DESC
-      `;
-  if (query.topic !== undefined) {
-    queryParams.push(query.topic);
-    const topicQuery = queryStr.replace(
-      "GROUP BY articles.article_id",
-      "WHERE topic = $1 GROUP BY articles.article_id",
-      queryParams
-    );
-    return db.query(topicQuery, queryParams).then((articles) => {
+  articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url 
+  FROM comments RIGHT OUTER JOIN articles
+  ON comments.article_id = articles.article_id
+  GROUP BY articles.article_id
+  ORDER BY created_at DESC
+  `;
+
+  // if a query has been used in the URL
+  if (Object.keys(query).length > 0) {
+    console.log("im here");
+    const queryParams = [];
+
+    let updatedQuery = `SELECT COUNT(comments.article_id) :: INT AS comment_count,
+    articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url 
+    FROM comments RIGHT OUTER JOIN articles
+    ON comments.article_id = articles.article_id
+    `;
+
+    if (query.topic !== undefined) {
+      queryParams.push(query.topic);
+      updatedQuery += ` WHERE topic = $1 GROUP BY articles.article_id `;
+    } else {
+      updatedQuery += ` GROUP BY articles.article_id `;
+    }
+
+    if (
+      query.sort_by !== undefined &&
+      !["votes", "created_at", "author", "title"].includes(query.sort_by)
+    ) {
+      return Promise.reject({ status: 400, msg: "Bad Request" });
+    } else if (query.sort_by !== undefined) {
+      updatedQuery += ` ORDER BY ${query.sort_by}`;
+    } else {
+      updatedQuery += ` ORDER BY created_at`;
+    }
+
+    if (
+      query.order_by !== undefined &&
+      !["ASC", "DESC"].includes(query.order_by)
+    ) {
+      return Promise.reject({ status: 400, msg: "Bad Request" });
+    } else if (query.order_by !== undefined) {
+      updatedQuery += ` ${query.order_by};`;
+    } else {
+      updatedQuery += ` DESC`;
+    }
+
+    return db.query(updatedQuery, queryParams).then((articles) => {
+      console.log(updatedQuery);
       return articles.rows;
     });
-  } else if (query.order_by !== undefined) {
-    queryParams.push(query.order_by);
-    const sortedQuery = queryStr.replace(
-      "ORDER BY created_at DESC;",
-      "ORDER BY votes DESC;",
-      queryParams
-    );
-    return db.query(sortedQuery, queryParams).then((articles) => {
+
+    // else return the original/default queryStr
+  } else {
+    return db.query(queryStr).then((articles) => {
       return articles.rows;
     });
   }
-
-  return db.query(queryStr).then((articles) => {
-    return articles.rows;
-  });
 }
 
 function fetchArticleById(article_id) {
