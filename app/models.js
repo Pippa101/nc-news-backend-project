@@ -1,7 +1,6 @@
 const { query } = require("../db/connection");
 const db = require("../db/connection");
 const comments = require("../db/data/test-data/comments");
-const format = require("pg-format");
 function fetchTopics() {
   return db.query(`SELECT * FROM topics;`).then((result) => {
     return result.rows;
