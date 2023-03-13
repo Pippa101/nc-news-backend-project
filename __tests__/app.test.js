@@ -470,7 +470,7 @@ describe("app", () => {
         });
     });
   });
-  describe.only("DELETE /api/comments/:comment_id", () => {
+  describe("DELETE /api/comments/:comment_id", () => {
     it("should return a 204 status : DELETE returns nothing", () => {
       return request(app).delete("/api/comments/1").expect(204);
     });
